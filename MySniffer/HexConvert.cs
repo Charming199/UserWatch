@@ -7,6 +7,28 @@ namespace MySniffer
 {
     class HexConvert
     {
+
+        public static string ConvertToAscii(byte[] data)
+        {
+            string ascii = "";
+            //转化原始数据
+            for (int i = 1; i <= data.Length; i++)
+            {
+                if (data[i - 1] < 0x21 || data[i - 1] > 0x7e)
+                {
+                    ascii += ".";
+                }
+                else
+                {
+                    ascii += Encoding.ASCII.GetString(new byte[1] { data[i - 1] });
+                }
+            }
+            return ascii;
+        }
+
+
+
+
         /// <summary>
         /// 拼接十六进制字符串
         /// </summary>

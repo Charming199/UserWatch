@@ -19,7 +19,7 @@ namespace MySniffer
         /// <returns>返回字符串数据</returns>
         public string[] Row(RawCapture rawPacket, uint packetID)
         {
-            string[] rows = new string[6];
+            string[] rows = new string[7];
 
             rows[0] = string.Format("{0:D7}", packetID);//编号
             rows[1] = "Unknown";
@@ -27,7 +27,8 @@ namespace MySniffer
             rows[3] = "--";
             rows[4] = "--";
             rows[5] = "--";
-
+            //rows[6] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff");
+            rows[6] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             Packet packet = Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
 
             EthernetPacket ep = EthernetPacket.GetEncapsulated(packet);
@@ -60,13 +61,38 @@ namespace MySniffer
                         rows[1] = "TCP";
                         rows[3] += " [" + tcp.SourcePort.ToString() + "]";
                         rows[4] += " [" + tcp.DestinationPort.ToString() + "]";
-                     
+
+                        #region 25:smtp协议;80, 8080, 3128: Http; 21: FTP;
+                        if (tcp.DestinationPort.ToString() == "25" || tcp.SourcePort.ToString() == "25")
+                        {
+                            rows[1] = "SMTP";
+                        }
+                        else if (tcp.DestinationPort.ToString() == "80" || tcp.DestinationPort.ToString() == "8080" || tcp.DestinationPort.ToString() == "3128")
+                        {
+                            rows[1] = "HTTP";
+                        }
+                        else if (tcp.DestinationPort.ToString() == "21")
+                        {
+                            rows[1] = "FTP";
+                        }
+                        else if (tcp.DestinationPort.ToString() == "143")
+                        {
+                            rows[1] = "POP3";
+                        }
+                        #endregion
                         return rows;
                     }
                     UdpPacket udp = UdpPacket.GetEncapsulated(packet);
                     if (udp != null)
                     {
-                        rows[1] = "UDP";
+                        if (rawPacket.Data[42] == ((byte)02))
+                        {
+                            rows[1] = "OICQ";
+                        }
+                        else
+                        {
+                            rows[1] = "UDP";
+                        }
                         rows[3] += " [" + udp.SourcePort.ToString() + "]";
                         rows[4] += " [" + udp.DestinationPort.ToString() + "]";
                         return rows;
@@ -163,14 +189,17 @@ namespace MySniffer
                 rows[5] = "地址：" + hdlc.Address.ToString("X2") + " 控制：" + hdlc.Control.ToString() + " 协议类型:" + hdlc.Protocol.ToString();
                 return rows;
             }
-#warning 需要测试
+            #region
+            //SmtpPacket smtp = SmtpPacket.
+            #endregion
+
             PacketDotNet.Ieee80211.MacFrame ieee = Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data) as PacketDotNet.Ieee80211.MacFrame;
             if (ieee != null)
             {
                 rows[1] = "IEEE802.11 MacFrame";
                 rows[3] = "--";
                 rows[4] = "--";
-                rows[5] = "帧校验序列:" + ieee.FrameCheckSequence.ToString() + " 封装帧:" + ieee.FrameControl .ToString();
+                rows[5] = "帧校验序列:" + ieee.FrameCheckSequence.ToString() + " 封装帧:" + ieee.FrameControl.ToString();
                 return rows;
             }
             PacketDotNet.Ieee80211.RadioPacket ieeePacket = Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data) as PacketDotNet.Ieee80211.RadioPacket;
@@ -188,7 +217,7 @@ namespace MySniffer
             return rows;
         }
     }
-        #endregion
+    #endregion
 
 
 

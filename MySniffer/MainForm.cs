@@ -9,14 +9,61 @@ using System.Windows.Forms;
 using System.Threading;
 using SharpPcap;
 using SharpPcap.LibPcap;//引用SharpPcap
+using System.Windows.Forms.DataVisualization.Charting;
+
 namespace MySniffer
 {
     public partial class MainForm : Form
     {
+        ICaptureDevice device;// 定义设备
+        List<RawCapture> packetList = new List<RawCapture>();//捕获的数据列表
+        List<RawCapture> bufferList;//缓存列表
+
+        Thread AnalyzerThread;//分析数据的线程
+        object threadLock = new object();//线程锁定
+        bool isStartAnalyzer;//用于表示是否启动分析线程的标志
+        DeviceMode devMode = DeviceMode.Promiscuous;//数据采集模式
+        int readTimeOut = 1000;
+        delegate void DataGridRowsShowHandler(RawCapture packet);
+        DataBuilder rowsBulider = new DataBuilder();
+
+        private static readonly object syncRoot = new object();
+
+        PacketInfo pktInfo;
+        uint packetIndex = 0;
+        uint temp_packetIndex;
+
+
+        /// <summary>
+        /// QQ上下线引用
+        /// </summary>
+        ProcessingQQLoginLogout pqll;
+        /// <summary>
+        /// QQ上下线单例列表
+        /// </summary>
+        ProcessingQQLoginLogoutList<ProcessingQQLoginLogout> pqllList = ProcessingQQLoginLogoutList<ProcessingQQLoginLogout>.GetInstance();
+
+        ProcessingAllDataList<ProcessingAllData> padList = ProcessingAllDataList<ProcessingAllData>.GetInstance();
+
+
+        ProcessingAllData rowData;
+
+        List<ProcessingAllData> padBufferList = new List<ProcessingAllData>();
+        List<ProcessingQQLoginLogout> pqllBufferList = new List<ProcessingQQLoginLogout>();
+
+
+        /// <summary>
+        /// 邮件引用
+        /// </summary>
+        ProcessingEmail pe = new ProcessingEmail();
+
+        private int countQQ = 0;
+
         public MainForm()
         {
             InitializeComponent();
 
+            
             pktInfo = new PacketInfo(this.treeView1);
         }
 
@@ -27,18 +74,7 @@ namespace MySniffer
 
 
 
-        ICaptureDevice device;// 定义设备
-        List<RawCapture> packetList = new List<RawCapture>();//捕获的数据列表
-        List<RawCapture> bufferList;//缓存列表
-        Thread AnalyzerThread;//分析数据的线程
-        object threadLock = new object();//线程锁定
-        bool isStartAnalyzer;//用于表示是否启动分析线程的标志
-        DeviceMode devMode = DeviceMode.Promiscuous;//数据采集模式
-        int readTimeOut = 1000;
-        delegate void DataGridRowsShowHandler(RawCapture packet);
-        DataBuilder rowsBulider = new DataBuilder();
-        PacketInfo pktInfo;
-        uint packetIndex = 0;
+       
 
 
         private void loadDevice()// 获取网卡方法
@@ -73,7 +109,7 @@ namespace MySniffer
             btnStop.Enabled = isStart;
             btnOpen.Enabled = !isStart;
             btnSave.Enabled = !isStart;
-            checkBox1.Enabled = !isStart;
+            //checkBox1.Enabled = !isStart;
 
         }
 
@@ -94,10 +130,7 @@ namespace MySniffer
 
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            devMode = (checkBox1.Checked) ? DeviceMode.Promiscuous : DeviceMode.Normal;
-        }
+    
 
 
         /// <summary>
@@ -121,7 +154,7 @@ namespace MySniffer
                 device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
                 //默认使用混杂模式，超时 1000
                 device.Open(devMode, readTimeOut);
-                device.Filter = comFilter.Text;
+               // device.Filter = comFilter.Text;
                 device.StartCapture();
 
                 UIConfig(true);
@@ -132,6 +165,7 @@ namespace MySniffer
 
                 UIConfig(false);
             }
+            InitChart();
 
         }
         /// <summary>
@@ -213,14 +247,133 @@ namespace MySniffer
 
         private void ShowDataRows(RawCapture packet)
         {
+
+
             try
             {
-                dataGridPacket.Rows.Add(rowsBulider.Row(packet, ++packetIndex));//加载DataGridRows;
+                temp_packetIndex = packetIndex + 1;
+                dataGridPacket.Rows.Add(rowsBulider.Row(packet, temp_packetIndex));//加载DataGridRows;
+
+
+                string[] rowsLinebuffer = new string[7];
+
+                rowsLinebuffer = rowsBulider.Row(packet, ++packetIndex);
+                Console.WriteLine("rowsLinebuffer is "+ rowsLinebuffer.Length);
+                if (rowsLinebuffer[1] == "TCP" || rowsLinebuffer[1] == "SMTP" || rowsLinebuffer[1] == "POP3" || rowsLinebuffer[1] == "HTTP" || rowsLinebuffer[1] == "OICQ")
+                {
+
+                    rowData = new ProcessingAllData();
+                    rowData.Id = rowsLinebuffer[0];
+                    rowData.Protocol = rowsLinebuffer[1];
+                    rowData.Length = rowsLinebuffer[2];
+                    rowData.SourceAddress = rowsLinebuffer[3];
+                    rowData.DestinationAddress = rowsLinebuffer[4];
+                    rowData.HardwareType = rowsLinebuffer[5];
+                    rowData.Time = rowsLinebuffer[6];
+                    rowData.BinaryData = packet.Data; //?
+                    rowData.Data = HexConvert.ConvertToAscii(packet.Data);
+
+                    //添加总的数据
+                    lock (padList.SyncRoot)
+                    {
+                        padList.Add(rowData);
+                    }
+
+                    //saveAllData.SaveAll(saveAllData.MyConnect,rowData);
+
+
+
+
+
+                    if (rowsLinebuffer[1] == "OICQ")
+                    {
+                        pqll = new ProcessingQQLoginLogout();
+                        countQQ += pqll.Analysis(rowData);
+                        if (pqll.QqLogin == 1 || pqll.QqLogin == 2)
+                        {
+                            lock (pqllList.SyncRoot)
+                            {
+                                pqllList.Add(pqll);
+                                //这里写存入数据库的代码
+                            }
+                        }
+
+                    }
+
+                }
+
             }
             catch (Exception ex)
             {
-
+                MessageBox.Show(ex.Message);
             }
+
+            this.qqNoticeLabel.Text = "已捕获QQ上下线记录" + countQQ + "条";
+
+        }
+
+
+        /// <summary>
+        /// 将分析好的数据添加到列表
+        /// </summary>
+        /// <param name="packet"></param>
+        private void AddDataToList(RawCapture packet)
+        {
+            Console.Write("AddDataToList");
+
+            try
+            {
+                string[] rowsLinebuffer = new string[7];
+                rowsLinebuffer = rowsBulider.Row(packet, ++packetIndex);
+                if (rowsLinebuffer[1] == "TCP" || rowsLinebuffer[1] == "SMTP" || rowsLinebuffer[1] == "POP3" || rowsLinebuffer[1] == "HTTP" || rowsLinebuffer[1] == "OICQ")
+                {
+                    rowData = new ProcessingAllData();
+                    rowData.Id = rowsLinebuffer[0];
+                    rowData.Protocol = rowsLinebuffer[1];
+                    rowData.Length = rowsLinebuffer[2];
+                    rowData.SourceAddress = rowsLinebuffer[3];
+                    rowData.DestinationAddress = rowsLinebuffer[4];
+                    rowData.HardwareType = rowsLinebuffer[5];
+                    rowData.Time = rowsLinebuffer[6];
+                    rowData.BinaryData = packet.Data; //?
+                    rowData.Data = HexConvert.ConvertToAscii(packet.Data);
+
+                    //添加总的数据
+                    lock (padList.SyncRoot)
+                    {
+                        padList.Add(rowData);
+                    }
+
+                    //saveAllData.SaveAll(saveAllData.MyConnect,rowData);
+
+                    
+
+
+
+                    if (rowsLinebuffer[1] == "OICQ")
+                    {
+                        pqll = new ProcessingQQLoginLogout();
+                        countQQ += pqll.Analysis(rowData);
+                        if (pqll.QqLogin == 1 || pqll.QqLogin == 2)
+                        {
+                            lock (pqllList.SyncRoot)
+                            {
+                                pqllList.Add(pqll);
+                                //这里写存入数据库的代码
+                            }
+                        }
+
+                    }
+        
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            //this.staffNoticeLabel.Text = "今日新增记录" + countBehave + "条";
+            this.qqNoticeLabel.Text = "今日新增记录" + countQQ + "条";
+            //this.emailNoticeLabel.Text = "今日新增记录" + countEmail + "条";
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -302,6 +455,94 @@ namespace MySniffer
                 offDev.Close();
 
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridPacket_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void dataGridPacket_CancelRowEdit(object sender, QuestionEventArgs e)
+        {
+
+        }
+
+        private void qqLoginOpenLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void qqNoticeLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chartflow_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //流量监控图
+        System.Windows.Forms.Timer chartTimer = new System.Windows.Forms.Timer();
+
+
+        // <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void chartTimer_Tick(object sender, EventArgs e)
+        {
+            int length = 0;
+            if (packetList != null)
+            {
+                lock (syncRoot)
+                {
+                    foreach (RawCapture rawCapture in packetList)
+                    {
+                        length += rawCapture.Data.Length;
+                    }
+                }
+
+                try
+                {
+                    //Random ra = new Random();
+                    Series series = chartflow.Series[0];
+                    //series.Points.AddXY(DateTime.Now, ra.Next(1, 10));
+                    series.Points.AddXY(DateTime.Now, length / 1024);
+                    chartflow.ChartAreas[0].AxisX.ScaleView.Position = series.Points.Count - 5;
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+
+
+        private void InitChart()
+        {
+            DateTime time = DateTime.Now;
+            chartTimer.Interval = 1000;
+            chartTimer.Tick += chartTimer_Tick;
+            //chartflow.DoubleClick += chartflow_DoubleClick;
+
+            Series series = chartflow.Series[0];
+            series.ChartType = SeriesChartType.Spline;
+            series.IsVisibleInLegend = false;
+
+            chartflow.ChartAreas[0].AxisX.LabelStyle.Format = "HH:mm:ss";
+            chartflow.ChartAreas[0].AxisX.ScaleView.Size = 5;
+            chartflow.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+            chartflow.ChartAreas[0].AxisX.ScrollBar.Enabled = true;
+
+            chartTimer.Start();
         }
     }
 }

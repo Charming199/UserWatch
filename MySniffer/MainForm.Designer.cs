@@ -30,6 +30,10 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSave = new System.Windows.Forms.ToolStripButton();
@@ -48,18 +52,29 @@
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.staffMonitoringPanel = new System.Windows.Forms.Panel();
+            this.staffMonitoringOpenLabel = new System.Windows.Forms.Label();
+            this.staffNoticeLabel = new System.Windows.Forms.Label();
+            this.qqLoginPanel = new System.Windows.Forms.Panel();
+            this.qqLoginOpenLabel = new System.Windows.Forms.Label();
+            this.qqNoticeLabel = new System.Windows.Forms.Label();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.chartflow = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.toolStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridPacket)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.staffMonitoringPanel.SuspendLayout();
+            this.qqLoginPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartflow)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -156,7 +171,7 @@
             this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 50);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -167,8 +182,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(1083, 591);
-            this.splitContainer1.SplitterDistance = 231;
+            this.splitContainer1.Size = new System.Drawing.Size(1083, 634);
+            this.splitContainer1.SplitterDistance = 247;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -189,7 +204,7 @@
             this.Column6});
             this.dataGridPacket.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridPacket.Location = new System.Drawing.Point(0, 0);
-            this.dataGridPacket.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridPacket.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridPacket.MultiSelect = false;
             this.dataGridPacket.Name = "dataGridPacket";
             this.dataGridPacket.ReadOnly = true;
@@ -200,8 +215,10 @@
             this.dataGridPacket.ShowCellToolTips = false;
             this.dataGridPacket.ShowEditingIcon = false;
             this.dataGridPacket.ShowRowErrors = false;
-            this.dataGridPacket.Size = new System.Drawing.Size(1081, 229);
+            this.dataGridPacket.Size = new System.Drawing.Size(1081, 245);
             this.dataGridPacket.TabIndex = 0;
+            this.dataGridPacket.CancelRowEdit += new System.Windows.Forms.QuestionEventHandler(this.dataGridPacket_CancelRowEdit);
+            this.dataGridPacket.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridPacket_CellContentClick);
             this.dataGridPacket.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridPacket_CellMouseDown);
             // 
             // Column1
@@ -245,31 +262,119 @@
             this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer2.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer2.Name = "splitContainer2";
             // 
             // splitContainer2.Panel1
             // 
+            this.splitContainer2.Panel1.Controls.Add(this.richTextBox1);
+            this.splitContainer2.Panel1.Controls.Add(this.staffMonitoringPanel);
+            this.splitContainer2.Panel1.Controls.Add(this.qqLoginPanel);
             this.splitContainer2.Panel1.Controls.Add(this.treeView1);
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.richTextBox1);
-            this.splitContainer2.Size = new System.Drawing.Size(1083, 355);
+            this.splitContainer2.Panel2.Controls.Add(this.chartflow);
+            this.splitContainer2.Size = new System.Drawing.Size(1083, 382);
             this.splitContainer2.SplitterDistance = 529;
             this.splitContainer2.SplitterWidth = 5;
             this.splitContainer2.TabIndex = 0;
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBox1.Font = new System.Drawing.Font("宋体", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.richTextBox1.Location = new System.Drawing.Point(221, 192);
+            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(306, 188);
+            this.richTextBox1.TabIndex = 0;
+            this.richTextBox1.Text = "";
+            this.richTextBox1.WordWrap = false;
+            // 
+            // staffMonitoringPanel
+            // 
+            this.staffMonitoringPanel.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.staffMonitoringPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.staffMonitoringPanel.Controls.Add(this.staffMonitoringOpenLabel);
+            this.staffMonitoringPanel.Controls.Add(this.staffNoticeLabel);
+            this.staffMonitoringPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.staffMonitoringPanel.Location = new System.Drawing.Point(221, 93);
+            this.staffMonitoringPanel.Margin = new System.Windows.Forms.Padding(4);
+            this.staffMonitoringPanel.Name = "staffMonitoringPanel";
+            this.staffMonitoringPanel.Size = new System.Drawing.Size(306, 99);
+            this.staffMonitoringPanel.TabIndex = 9;
+            // 
+            // staffMonitoringOpenLabel
+            // 
+            this.staffMonitoringOpenLabel.AutoSize = true;
+            this.staffMonitoringOpenLabel.Font = new System.Drawing.Font("等线", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.staffMonitoringOpenLabel.Location = new System.Drawing.Point(4, 16);
+            this.staffMonitoringOpenLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.staffMonitoringOpenLabel.Name = "staffMonitoringOpenLabel";
+            this.staffMonitoringOpenLabel.Size = new System.Drawing.Size(162, 26);
+            this.staffMonitoringOpenLabel.TabIndex = 0;
+            this.staffMonitoringOpenLabel.Text = "影音娱乐检测";
+            // 
+            // staffNoticeLabel
+            // 
+            this.staffNoticeLabel.AutoSize = true;
+            this.staffNoticeLabel.Font = new System.Drawing.Font("等线", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.staffNoticeLabel.Location = new System.Drawing.Point(49, 54);
+            this.staffNoticeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.staffNoticeLabel.Name = "staffNoticeLabel";
+            this.staffNoticeLabel.Size = new System.Drawing.Size(120, 15);
+            this.staffNoticeLabel.TabIndex = 3;
+            this.staffNoticeLabel.Text = "今日新增记录0条";
+            // 
+            // qqLoginPanel
+            // 
+            this.qqLoginPanel.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.qqLoginPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.qqLoginPanel.Controls.Add(this.qqLoginOpenLabel);
+            this.qqLoginPanel.Controls.Add(this.qqNoticeLabel);
+            this.qqLoginPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.qqLoginPanel.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.qqLoginPanel.Location = new System.Drawing.Point(221, 0);
+            this.qqLoginPanel.Margin = new System.Windows.Forms.Padding(4);
+            this.qqLoginPanel.Name = "qqLoginPanel";
+            this.qqLoginPanel.Size = new System.Drawing.Size(306, 93);
+            this.qqLoginPanel.TabIndex = 8;
+            // 
+            // qqLoginOpenLabel
+            // 
+            this.qqLoginOpenLabel.AutoSize = true;
+            this.qqLoginOpenLabel.Font = new System.Drawing.Font("等线", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.qqLoginOpenLabel.Location = new System.Drawing.Point(4, 12);
+            this.qqLoginOpenLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.qqLoginOpenLabel.Name = "qqLoginOpenLabel";
+            this.qqLoginOpenLabel.Size = new System.Drawing.Size(150, 26);
+            this.qqLoginOpenLabel.TabIndex = 1;
+            this.qqLoginOpenLabel.Text = "QQ登录监测";
+            this.qqLoginOpenLabel.Click += new System.EventHandler(this.qqLoginOpenLabel_Click);
+            // 
+            // qqNoticeLabel
+            // 
+            this.qqNoticeLabel.AutoSize = true;
+            this.qqNoticeLabel.Font = new System.Drawing.Font("等线", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.qqNoticeLabel.Location = new System.Drawing.Point(49, 59);
+            this.qqNoticeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.qqNoticeLabel.Name = "qqNoticeLabel";
+            this.qqNoticeLabel.Size = new System.Drawing.Size(172, 15);
+            this.qqNoticeLabel.TabIndex = 4;
+            this.qqNoticeLabel.Text = "已捕获QQ上下线记录0条";
+            this.qqNoticeLabel.Click += new System.EventHandler(this.qqNoticeLabel_Click);
+            // 
             // treeView1
             // 
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Left;
             this.treeView1.ImageIndex = 0;
             this.treeView1.ImageList = this.imageList1;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
-            this.treeView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.treeView1.Margin = new System.Windows.Forms.Padding(4);
             this.treeView1.Name = "treeView1";
             this.treeView1.SelectedImageIndex = 0;
-            this.treeView1.Size = new System.Drawing.Size(527, 353);
+            this.treeView1.Size = new System.Drawing.Size(221, 380);
             this.treeView1.TabIndex = 0;
             // 
             // imageList1
@@ -278,43 +383,47 @@
             this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList1.Images.SetKeyName(0, "BD14656_.GIF");
             // 
-            // richTextBox1
+            // chartflow
             // 
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
-            this.richTextBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(547, 353);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            this.richTextBox1.WordWrap = false;
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.BackColor = System.Drawing.Color.White;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(851, 15);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(89, 19);
-            this.checkBox1.TabIndex = 2;
-            this.checkBox1.Text = "混杂模式";
-            this.checkBox1.UseVisualStyleBackColor = false;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            chartArea1.Name = "ChartArea1";
+            this.chartflow.ChartAreas.Add(chartArea1);
+            this.chartflow.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend1.Alignment = System.Drawing.StringAlignment.Far;
+            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Top;
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.chartflow.Legends.Add(legend1);
+            this.chartflow.Location = new System.Drawing.Point(0, 0);
+            this.chartflow.Margin = new System.Windows.Forms.Padding(4);
+            this.chartflow.Name = "chartflow";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series1.IsXValueIndexed = true;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Time;
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.IsXValueIndexed = true;
+            series2.Legend = "Legend1";
+            series2.Name = "Series2";
+            series2.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Time;
+            this.chartflow.Series.Add(series1);
+            this.chartflow.Series.Add(series2);
+            this.chartflow.Size = new System.Drawing.Size(547, 380);
+            this.chartflow.TabIndex = 1;
+            this.chartflow.Text = "chartflow";
+            this.chartflow.Click += new System.EventHandler(this.chartflow_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1083, 641);
-            this.Controls.Add(this.checkBox1);
+            this.ClientSize = new System.Drawing.Size(1083, 684);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "UserWatch";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
@@ -323,13 +432,19 @@
             this.toolStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridPacket)).EndInit();
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.staffMonitoringPanel.ResumeLayout(false);
+            this.staffMonitoringPanel.PerformLayout();
+            this.qqLoginPanel.ResumeLayout(false);
+            this.qqLoginPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartflow)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -356,7 +471,13 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Panel qqLoginPanel;
+        private System.Windows.Forms.Label qqLoginOpenLabel;
+        private System.Windows.Forms.Label qqNoticeLabel;
+        private System.Windows.Forms.Panel staffMonitoringPanel;
+        private System.Windows.Forms.Label staffMonitoringOpenLabel;
+        private System.Windows.Forms.Label staffNoticeLabel;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartflow;
     }
 }
 

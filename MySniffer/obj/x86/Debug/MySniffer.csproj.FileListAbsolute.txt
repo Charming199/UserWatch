@@ -24,3 +24,17 @@ C:\Users\Administrator\Desktop\MySniffer\MySniffer\obj\x86\Debug\MySniffer.cspro
 C:\Users\Administrator\Desktop\MySniffer\MySniffer\obj\x86\Debug\MySniffer.MainForm.resources
 C:\Users\Administrator\Desktop\MySniffer\MySniffer\obj\x86\Debug\MySniffer.Properties.Resources.resources
 C:\Users\Administrator\Desktop\MySniffer\MySniffer\obj\x86\Debug\MySniffer.csproj.GenerateResource.Cache
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.exe
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.pdb
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\MySniffer.exe
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\MySniffer.pdb
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\SharpPcap.pdb
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\SharpPcap.xml
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\TwzyProtocol.pdb
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.csprojResolveAssemblyReference.cache
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.MainForm.resources
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.Properties.Resources.resources
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\obj\x86\Debug\MySniffer.csproj.GenerateResource.Cache
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\MySniffer.exe.config
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\System.Windows.Forms.DataVisualization.Design.dll
+C:\Users\Administrator\Desktop\MySniffer\UserWatch\MySniffer\bin\Debug\System.Windows.Forms.DataVisualization.dll

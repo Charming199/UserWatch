@@ -52,10 +52,7 @@ namespace MySniffer
         List<ProcessingQQLoginLogout> pqllBufferList = new List<ProcessingQQLoginLogout>();
 
 
-        /// <summary>
-        /// 邮件引用
-        /// </summary>
-        ProcessingEmail pe = new ProcessingEmail();
+   
 
         private int countQQ = 0;
 
@@ -151,10 +148,8 @@ namespace MySniffer
 
             try
             {
-                device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);
-                //默认使用混杂模式，超时 1000
+                device.OnPacketArrival += new PacketArrivalEventHandler(device_OnPacketArrival);                
                 device.Open(devMode, readTimeOut);
-               // device.Filter = comFilter.Text;
                 device.StartCapture();
 
                 UIConfig(true);
@@ -245,6 +240,8 @@ namespace MySniffer
             }
         }
 
+
+        /// 将分析好的数据添加到列表
         private void ShowDataRows(RawCapture packet)
         {
 
@@ -270,7 +267,7 @@ namespace MySniffer
                     rowData.DestinationAddress = rowsLinebuffer[4];
                     rowData.HardwareType = rowsLinebuffer[5];
                     rowData.Time = rowsLinebuffer[6];
-                    rowData.BinaryData = packet.Data; //?
+                    rowData.BinaryData = packet.Data; 
                     rowData.Data = HexConvert.ConvertToAscii(packet.Data);
 
                     //添加总的数据
@@ -313,68 +310,7 @@ namespace MySniffer
         }
 
 
-        /// <summary>
-        /// 将分析好的数据添加到列表
-        /// </summary>
-        /// <param name="packet"></param>
-        private void AddDataToList(RawCapture packet)
-        {
-            Console.Write("AddDataToList");
-
-            try
-            {
-                string[] rowsLinebuffer = new string[7];
-                rowsLinebuffer = rowsBulider.Row(packet, ++packetIndex);
-                if (rowsLinebuffer[1] == "TCP" || rowsLinebuffer[1] == "SMTP" || rowsLinebuffer[1] == "POP3" || rowsLinebuffer[1] == "HTTP" || rowsLinebuffer[1] == "OICQ")
-                {
-                    rowData = new ProcessingAllData();
-                    rowData.Id = rowsLinebuffer[0];
-                    rowData.Protocol = rowsLinebuffer[1];
-                    rowData.Length = rowsLinebuffer[2];
-                    rowData.SourceAddress = rowsLinebuffer[3];
-                    rowData.DestinationAddress = rowsLinebuffer[4];
-                    rowData.HardwareType = rowsLinebuffer[5];
-                    rowData.Time = rowsLinebuffer[6];
-                    rowData.BinaryData = packet.Data; //?
-                    rowData.Data = HexConvert.ConvertToAscii(packet.Data);
-
-                    //添加总的数据
-                    lock (padList.SyncRoot)
-                    {
-                        padList.Add(rowData);
-                    }
-
-                    //saveAllData.SaveAll(saveAllData.MyConnect,rowData);
-
-                    
-
-
-
-                    if (rowsLinebuffer[1] == "OICQ")
-                    {
-                        pqll = new ProcessingQQLoginLogout();
-                        countQQ += pqll.Analysis(rowData);
-                        if (pqll.QqLogin == 1 || pqll.QqLogin == 2)
-                        {
-                            lock (pqllList.SyncRoot)
-                            {
-                                pqllList.Add(pqll);
-                                //这里写存入数据库的代码
-                            }
-                        }
-
-                    }
-        
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            //this.staffNoticeLabel.Text = "今日新增记录" + countBehave + "条";
-            this.qqNoticeLabel.Text = "今日新增记录" + countQQ + "条";
-            //this.emailNoticeLabel.Text = "今日新增记录" + countEmail + "条";
-        }
+ 
 
         private void btnStart_Click(object sender, EventArgs e)
         {
